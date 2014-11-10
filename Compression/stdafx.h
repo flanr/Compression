@@ -10,6 +10,11 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <stdint.h>
+#include <string.h>
+
+#define SIZE 196608
+
 
 
 // TODO: reference additional headers your program requires here
