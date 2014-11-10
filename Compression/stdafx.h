@@ -11,7 +11,13 @@
 #include <tchar.h>
 
 #include <stdint.h>
-#include <string.h>
+#include <string>
+
+#include <iostream>
+
+#include <fstream>
+
+#include <vector>
 
 #define SIZE 196608
 

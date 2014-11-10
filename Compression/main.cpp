@@ -2,10 +2,17 @@
 //
 
 #include "stdafx.h"
+#include "Compressor.h"
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	Compressor comp;
+
+	comp.Compress("image.bmp");
+
+	system("pause");
+
 	return 0;
 }
 

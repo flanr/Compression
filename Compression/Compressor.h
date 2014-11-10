@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "stdafx.h"
 
 #pragma pack(push, 1)
 struct BMPHeader
@@ -24,10 +24,33 @@ struct BMPHeader
 };
 #pragma pack(pop)
 
+struct BITS
+{
+	bool b1 : 1;
+	bool b2 : 1;
+	bool b3 : 1;
+	bool b4 : 1;
+	bool b5 : 1;
+	bool b6 : 1;
+	bool b7 : 1;
+	bool b8 : 1;
+};
+
+struct PIXEL
+{
+	unsigned char r, g, b;
+	int x, y;
+};
+
 class Compressor
 {
 public:
 	Compressor();
 	~Compressor();
+
+	void Compress(const char *p_sFilePath);
+
+private:
+	std::vector<std::vector<PIXEL*>> m_vPixels;
 };
 
