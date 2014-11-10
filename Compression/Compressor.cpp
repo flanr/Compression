@@ -14,7 +14,6 @@ Compressor::~Compressor()
 void Compressor::Compress(const char *p_sFilePath)
 {
 	FILE* file;
-	struct BMPHeader header;
 	//char buffer[SIZE];
 	unsigned char *pixels, buffer[SIZE];
 
@@ -28,16 +27,69 @@ void Compressor::Compress(const char *p_sFilePath)
 	pixels = buffer + header.offset;
 
 	int x = 0, y = 0;
-
-	std::vector<PIXEL*> vpixels;
-
-	std::string finishedpixels = "";
-
 	unsigned char b1, r1, g1, b2, r2, g2;
 
-	int counter = 0;
+	char counter = 0;
+	char countercounter = 0;
 
-	for (int i = 0; i < SIZE; i+=3)
+	int size = 0;
+
+	{
+
+		for (int i = 0; i < SIZE; i += 3)
+		{
+			if (i >= SIZE)
+				break;
+
+			if (i == 0)
+			{
+				b1 = pixels[i];
+				g1 = pixels[i + 1];
+				r1 = pixels[i + 2];
+				counter++;
+				if (counter > 255)
+				{
+					counter = 0;
+					countercounter++;
+				}
+			}
+			else
+			{
+				b2 = pixels[i];
+				g2 = pixels[i + 1];
+				r2 = pixels[i + 2];
+
+				if (b1 == b2 && r1 == r2 && g1 == g2)
+				{
+					counter++;
+					if (counter > 255)
+					{
+						counter = 0;
+						countercounter++;
+					}
+				}
+				else
+				{
+					size+=2;
+					counter = 1;
+					countercounter = 0;
+					size += 3;
+					b1 = b2;
+					r1 = r2;
+					g1 = g2;
+				}
+			}
+		}
+	}
+	
+	unsigned char *finishedChars = new unsigned char[size];
+
+	int charcounter = 0;
+
+	counter = 0;
+	countercounter = 1;
+
+	for (int i = 0; i < SIZE; i += 3)
 	{
 		if (i >= SIZE)
 			break;
@@ -47,7 +99,15 @@ void Compressor::Compress(const char *p_sFilePath)
 			b1 = pixels[i];
 			g1 = pixels[i + 1];
 			r1 = pixels[i + 2];
-			counter++;
+			if ((int)counter == 255 || counter < 0)
+			{
+				counter = 0;
+				countercounter++;
+			}
+			else
+			{
+				counter++;
+			}
 		}
 		else
 		{
@@ -57,106 +117,105 @@ void Compressor::Compress(const char *p_sFilePath)
 
 			if (b1 == b2 && r1 == r2 && g1 == g2)
 			{
-				counter++;
+				if ((int)counter == 255 || counter < 0)
+				{
+					counter = 0;
+					countercounter++;
+				}
+				else
+				{
+					counter++;
+				}
+
+
 			}
 			else
 			{
-				finishedpixels += std::to_string(counter);
+				finishedChars[charcounter++] = countercounter;
+				finishedChars[charcounter++] = counter;
 				counter = 1;
-				finishedpixels += std::to_string(b1) + std::to_string(g1) + std::to_string(r1);
-
+				countercounter = 1;
+				finishedChars[charcounter++] = b1;
+				finishedChars[charcounter++] = g1;
+				finishedChars[charcounter++] = r1;
 				b1 = b2;
 				r1 = r2;
 				g1 = g2;
 			}
 		}
-		
-		/*PIXEL *pixel = new PIXEL;
-
-		if (x >= 256)
-		{
-			x = 0;
-			y++;
-
-			m_vPixels.push_back(vpixels);
-
-			vpixels.clear();
-		}
-
-		pixel->x = x;
-		pixel->y = y;
-
-		pixel->b = pixels[i];
-		pixel->g = pixels[i+1];
-		pixel->r = pixels[i+2];
-
-		x++;
-
-		vpixels.push_back(pixel);*/
 	}
 
-	//m_vPixels.push_back(vpixels);
+	std::ofstream outputChar("exampleChar.txt");
 
-	//std::cout << finishedpixels << std::endl;
-
-	/*BITS b = *(BITS*)(&m_vPixels[30][111]->b);
+	if (outputChar.is_open())
+	{
+		outputChar << finishedChars;
+	}
 
 	
+}
 
-	std::cout << b.b1 << std::endl;
-	std::cout << b.b2 << std::endl;
-	std::cout << b.b3 << std::endl;
-	std::cout << b.b4 << std::endl;
-	std::cout << b.b5 << std::endl;
-	std::cout << b.b6 << std::endl;
-	std::cout << b.b7 << std::endl;
-	std::cout << b.b8 << std::endl;
+void Compressor::Decompress(const char *p_sFilePath)
+{
+	
 
-	b = *(BITS*)(&m_vPixels[30][111]->g);
+	//of.write((char*)&header, header.size);
 
-	std::cout << b.b1 << std::endl;
-	std::cout << b.b2 << std::endl;
-	std::cout << b.b3 << std::endl;
-	std::cout << b.b4 << std::endl;
-	std::cout << b.b5 << std::endl;
-	std::cout << b.b6 << std::endl;
-	std::cout << b.b7 << std::endl;
-	std::cout << b.b8 << std::endl;
+	std::ifstream istream("exampleChar.txt", std::ifstream::ate | std::ifstream::binary | std::ifstream::in);
+	int size = istream.tellg();
+	istream.close();
 
-	b = *(BITS*)(&m_vPixels[30][111]->r);
+	FILE* file;
 
-	std::cout << b.b1 << std::endl;
-	std::cout << b.b2 << std::endl;
-	std::cout << b.b3 << std::endl;
-	std::cout << b.b4 << std::endl;
-	std::cout << b.b5 << std::endl;
-	std::cout << b.b6 << std::endl;
-	std::cout << b.b7 << std::endl;
-	std::cout << b.b8 << std::endl;
+	unsigned char *pixels, buffer[SIZE];
 
-	std::cout << m_vPixels[30][111]->r << std::endl;*/
+	unsigned char secondbuffer;
 
-	//std::cout << buffer;
+	fopen_s(&file, "exampleChar.txt", "rb");
 
-	/*int size;
 
-	std::ifstream filestream;
-	filestream.open(p_sFilePath);
-	if (!filestream.is_open())
+	fread(buffer, 1, SIZE, file);
+	fclose(file);
+
+	std::cout << buffer[0];
+
+	bool countingtimes = true;
+
+	int bgrcount = 0;
+
+	int timesFound = 0;
+
+	unsigned char b, g, r;
+
+	unsigned char characters[SIZE];
+
+	for (int i = 0; i < size; i++)
 	{
-		std::cout << "Not open muthafucka" << std::endl;
-	}
-	else
-	{
-		filestream >> size;
+		unsigned char currentChar = buffer[i];
 
-		std::cout << size << std::endl;
-	}*/
+		if (countingtimes)
+		{
+			timesFound = (int)buffer[i] * 255 + buffer[i+1];
+			i++;
+			countingtimes = false;
+			bgrcount = 0;
+		}
+		else
+		{
+			b = buffer[i++];
+			g = buffer[i++];
+			r = buffer[i];
 
-	std::ofstream output("example.txt");
+			for (int x = 0; x < timesFound; x++)
+			{
+				characters[x] = b;
+				x++;
+				characters[x] = g;
+				x++;
+				characters[x] = r;
+			}
 
-	if (output.is_open())
-	{
-		output << finishedpixels;
+			countingtimes = true;
+		}
 	}
 }

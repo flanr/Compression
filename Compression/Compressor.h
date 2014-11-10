@@ -36,6 +36,11 @@ struct BITS
 	bool b8 : 1;
 };
 
+struct BITMAPFILEHEADER
+{
+
+};
+
 struct PIXEL
 {
 	unsigned char r, g, b;
@@ -50,7 +55,11 @@ public:
 
 	void Compress(const char *p_sFilePath);
 
+	void Decompress(const char *p_sFilePath);
+
 private:
 	std::vector<std::vector<PIXEL*>> m_vPixels;
+
+	BMPHeader header;
 };
 

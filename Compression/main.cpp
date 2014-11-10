@@ -11,6 +11,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	comp.Compress("image.bmp");
 
+	comp.Decompress("lel.bmp");
+
 	system("pause");
 
 	return 0;
